@@ -83,9 +83,15 @@ public class PopulationQuery {
         
         System.out.println(data.getMinLat() + ", " + data.getMinLon() + ", " + data.getMaxLat() + ", " + data.getMaxLon());
         
-        //Prompt the user to enter a query
+        // parses the input txt file and calculates the min and max longitudes
+        CensusData thedata = parse(args[0]);
         
-        Scanner prompt = new Scanner(System.in);
+        // request user input
+        System.out.println("Please enter your box (4 ints):");
+        
+        // stores user input in string box
+        Scanner input = new Scanner(System.in);
+        String box = input.nextLine();
         
         
         
