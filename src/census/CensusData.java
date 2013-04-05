@@ -4,7 +4,7 @@ package census;
  *  
  *  note: array may not be full; see data_size field
  *  
- *  @author: Evan Casey
+ *  @author: Joe Newbry and Evan Casey
  */
 
 public class CensusData {
@@ -34,18 +34,7 @@ public class CensusData {
 		}
 		CensusGroup g = new CensusGroup(population,latitude,longitude); 
 		data[data_size++] = g;
-		if(latitude < minLat) {
-			minLat = latitude;
-		}
-		if(longitude < minLon) {
-			minLon = longitude;
-		}
-		if(latitude > maxLat) {
-			maxLat = latitude;
-		}
-		if(longitude > minLon) {
-			maxLon = longitude;
-		}
+		findEdges();
 	}
 	
 	public void findEdges() {

@@ -20,6 +20,15 @@ public class Rectangle {
 		bottom = b;
 	}
 	
+	public Rectangle makeOneRec (CensusData data, CensusGroup group) {
+		group.getLatitude();
+		group.getLongitude();
+		
+		data.getMinLat();;
+		data.getMinLon();
+		return new Rectangle
+	}
+	
 	// a functional operation: returns a new Rectangle that is the smallest rectangle
 	// containing this and that
 	public Rectangle encompass(Rectangle that) {

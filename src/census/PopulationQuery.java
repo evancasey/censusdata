@@ -87,11 +87,15 @@ public class PopulationQuery {
         CensusData thedata = parse(args[0]);
         
         // request user input
-        System.out.println("Please enter your box (4 ints):");
+        System.out.println("Please enter your box coordinates (separate by spaces):");
         
         // stores user input in string box
         Scanner input = new Scanner(System.in);
-        String box = input.nextLine();
+        String dims = input.nextLine();
+        String[] dimsArray = dims.split(" ");
+      
+        Rectangle populationIn = new Rectangle(Integer.getInteger(dimsArray[0]), Integer.getInteger(dimsArray[1]), 
+        										Integer.getInteger(dimsArray[2]), Integer.getInteger(dimsArray[3]));
         
         //Create a bunch of rectangles based on max lon and lat and number of buckets
         //How do we associate each census group with a particular rectangle --> no preprocessing?
