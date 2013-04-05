@@ -78,8 +78,8 @@ public class PopulationQuery {
         CensusData data = new CensusData();
         data = parse(args[0]);
         
-        int xDim = Integer.parseInt(args[1]);
-        int yDim = Integer.parseInt(args[2]);
+        int xBuckets = Integer.parseInt(args[1]);
+        int yBuckets = Integer.parseInt(args[2]);
         
         System.out.println(data.getMinLat() + ", " + data.getMinLon() + ", " + data.getMaxLat() + ", " + data.getMaxLon());
         
