@@ -87,12 +87,14 @@ public class PopulationQuery {
         CensusData thedata = parse(args[0]);
         
         // request user input
-        System.out.println("Please enter your box (4 ints):");
+        System.out.println("Please enter your box coordinates (separate by spaces):");
         
         // stores user input in string box
         Scanner input = new Scanner(System.in);
-        String box = input.nextLine();
+        String dims = input.nextLine();
+        String[] dimsArray = dims.split(" ");
         
+        System.out.print(dimsArray[0] + ", " + dimsArray[1] + ", " + dimsArray[2] + ", " + dimsArray[3]);
         
         
         

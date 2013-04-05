@@ -48,32 +48,6 @@ public class CensusData {
 		}
 	}
 	
-	public void findEdges() {
-		//set minLat
-		minLat = data[0].getLatitude();
-		for(int i = 1; i < data_size; i++) {
-
-		}
-		
-		//set minLon
-		minLon = data[0].getLongitude();
-		for(int i = 1; i < data_size; i++) {
-
-		}
-		
-		//set maxLat
-		maxLat = data[0].getLatitude();
-		for(int i = 1; i < data_size; i++) {
-
-		}
-		
-		//set maxLon
-		maxLon = data[0].getLongitude();
-		for(int i = 1; i < data_size; i++) {
-
-		}
-	}
-	
 	//get minLat
 	public float getMinLat() {
 		return minLat;
