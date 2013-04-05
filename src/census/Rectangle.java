@@ -2,7 +2,7 @@ package census;
 /** A class to represent a Rectangle
  *  You do not have to use this, but it's quite convenient
  *  
- *  @author Your Name Here
+ *  @author Joe Newbry and Evan Casey
  */
  
 public class Rectangle {

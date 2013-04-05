@@ -93,9 +93,6 @@ public class PopulationQuery {
         Scanner input = new Scanner(System.in);
         String box = input.nextLine();
         
-        
-        
-        
         //Create a bunch of rectangles based on max lon and lat and number of buckets
         //How do we associate each census group with a particular rectangle --> no preprocessing?
         

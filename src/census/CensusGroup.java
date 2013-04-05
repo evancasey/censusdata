@@ -3,7 +3,7 @@ package census;
  * class that uses Mercator project to convert coordinates
  * on a sphere into coordinates onto a flat plane
  * 
- * @author Your Name Here
+ * @author Joe Newbry and Evan Casey
  */
 
 public class CensusGroup {
