@@ -31,16 +31,16 @@ public class Rectangle {
 		float yRecDim = yLength/yBucket;
 		
 		//Calculate the rectangle coordinates of our CensusGroup
-		float xLoc = 1;
-		float yLoc = 1;	
+		int xLoc = 1;
+		int yLoc = 1;	
 		if (xRecDim > 0) {
-			xLoc = (group.getLatitude()/xRecDim) + 1;
+			xLoc = (int) ((group.getLatitude()-data.getMinLat())/xRecDim) + 1;
 		}
 		if (yRecDim > 0) {
-			yLoc = (group.getLongitude()/yRecDim) + 1;
+			yLoc = (int) ((group.getLongitude()-data.getMinLon())/yRecDim) + 1;
 		}
 		
-		System.out.println("[" + xLoc + ", " + xLoc + 1 + ", " + yLoc + ", " + yLoc + 1 + "]");
+		System.out.println("[" + xLoc + ", " + (xLoc + 1) + ", " + yLoc + ", " + (yLoc + 1) + "]");
 		return new Rectangle(xLoc, xLoc + 1, yLoc, yLoc + 1);
 	}
 	

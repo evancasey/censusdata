@@ -27,10 +27,10 @@ public class CensusData {
 	public CensusData() {
 		data = new CensusGroup[INITIAL_SIZE];
 		data_size = 0;
-		minLon = 100;
 		minLat = 100;
-		maxLon = 0;
+		minLon = 100;
 		maxLat = 0;
+		maxLon = 0;
 	}
 	
 	public void add(int population, float latitude, float longitude) {
@@ -42,17 +42,17 @@ public class CensusData {
 		}
 		CensusGroup g = new CensusGroup(population,latitude,longitude); 
 		data[data_size++] = g;
-	    if(latitude < minLat) {
-	    	minLat = latitude;
+	    if(g.getLatitude() < minLat) {
+	    	minLat = g.getLatitude();
 	    }
-	    if(longitude < minLon) {
-	    	minLon = longitude;
+	    if(g.getLongitude() < minLon) {
+	    	minLon = g.getLongitude();
 	    }
-	    if(latitude > maxLat) {
-	    	maxLat = latitude;
+	    if(g.getLatitude() > maxLat) {
+	    	maxLat = g.getLatitude();
 	    }
-	    if(longitude > minLon) {
-	    	maxLon = longitude;
+	    if(g.getLongitude() > minLon) {
+	    	maxLon = g.getLongitude();
 	    }
 	}
 	
