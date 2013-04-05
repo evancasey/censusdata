@@ -29,18 +29,21 @@ public class Rectangle {
 		//Find latitude and longitude lengths of each rectangle partition
 		float xRecDim = xLength/xBucket;
 		float yRecDim = yLength/yBucket;
+		//System.out.println(yRecDim);
 		
 		//Calculate the rectangle coordinates of our CensusGroup
 		int xLoc = 1;
 		int yLoc = 1;	
-		if (xRecDim > 0) {
+		if (xRecDim > 0.0) {
 			xLoc = (int) ((group.getLatitude()-data.getMinLat())/xRecDim) + 1;
 		}
-		if (yRecDim > 0) {
+		if (yRecDim > 0.0) {
 			yLoc = (int) ((group.getLongitude()-data.getMinLon())/yRecDim) + 1;
 		}
 		
 		System.out.println("[" + xLoc + ", " + (xLoc + 1) + ", " + yLoc + ", " + (yLoc + 1) + "]");
+		System.out.println(group.getLatitude() + ", " + group.getLongitude());
+		
 		return new Rectangle(xLoc, xLoc + 1, yLoc, yLoc + 1);
 	}
 	

@@ -15,7 +15,7 @@ public class CensusGroup {
 	public CensusGroup(int pop, float lat, float lon) {
 		population = pop;
 		realLatitude = lat;
-		latitude   = mercatorConversion(lat); //replace this line with 'latitude=lat;' if you want to manually enter in actual latitude values for testing
+		latitude   = mercatorConversion(lat); 
 		longitude  = lon;
 	}
 	

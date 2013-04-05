@@ -10,15 +10,7 @@ package census;
 public class CensusData {
 	private static final int INITIAL_SIZE = 100;
 	private CensusGroup[] data;
-
-
 	private int data_size;
-	
-	
-	
-	
-
-
 	private float minLon;
 	private float minLat;
 	private float maxLon;
@@ -27,10 +19,10 @@ public class CensusData {
 	public CensusData() {
 		data = new CensusGroup[INITIAL_SIZE];
 		data_size = 0;
-		minLat = 100;
-		minLon = 100;
-		maxLat = 0;
-		maxLon = 0;
+		minLat = 100; //minLat should be below this and positive
+		minLon = 100; //maxLon should be above this and negative
+		maxLat = -100; //maxLon should be above this and positive
+		maxLon = -100; //maxLon should be above this and negative
 	}
 	
 	public void add(int population, float latitude, float longitude) {
@@ -51,7 +43,7 @@ public class CensusData {
 	    if(g.getLatitude() > maxLat) {
 	    	maxLat = g.getLatitude();
 	    }
-	    if(g.getLongitude() > minLon) {
+	    if(g.getLongitude() > maxLon) {
 	    	maxLon = g.getLongitude();
 	    }
 	}
