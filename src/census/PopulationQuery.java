@@ -93,17 +93,31 @@ public class PopulationQuery {
         Scanner input = new Scanner(System.in);
         String dims = input.nextLine();
         String[] dimsArray = dims.split(" ");
-        Rectangle populationIn = new Rectangle(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), 
+        Rectangle popRec = new Rectangle(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), 
         										Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3]));
         
         // storing in values before hand to increase prevent multiple lookup
         int size = thedata.getData_size();
         CensusGroup[] censusGroups = thedata.getData();
-        
+        int sumPop = 0;
+        int sumTotal = 0;
+        int evalTrue = 0;
         for (int i = 0; i < size; i++){
         	Rectangle currentGroupRect = Rectangle.makeOneRec(thedata, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
-        	//populationIn.encompass(currentGroupRect);
+        	
+        	// adds the population of census group if it is contained in the census rectangle
+        	
+        	if(currentGroupRect.contains(popRec)){
+        		sumPop = sumPop + censusGroups[i].getPopulation();
+        		evalTrue ++;
+        	}
+        	// keeps track of all the people
+        	sumTotal = sumTotal + censusGroups[i].getPopulation();
         }
+        
+        System.out.println("Population in census rectangle: " + sumPop);
+        System.out.println("Percentage of total population in rectangle: " + (sumPop/sumTotal)*100 + "%");
+        System.out.println("Number of truths " + evalTrue);
         
         //Create a bunch of rectangles based on max lon and lat and number of buckets
         //How do we associate each census group with a particular rectangle --> no preprocessing?

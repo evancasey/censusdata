@@ -42,7 +42,6 @@ public class Rectangle {
 		}
 		
 		System.out.println("[" + xLoc + ", " + (xLoc + 1) + ", " + yLoc + ", " + (yLoc + 1) + "]");
-		System.out.println(group.getLatitude() + ", " + group.getLongitude());
 		
 		return new Rectangle(xLoc, xLoc + 1, yLoc, yLoc + 1);
 	}
@@ -56,7 +55,32 @@ public class Rectangle {
 				             Math.min(this.bottom, that.bottom));
 	}
 	
+	public Boolean contains(Rectangle that) {
+		if (that.getLeft() >= this.getLeft() && that.getRight() <= this.getRight()
+				&& that.getTop() >= this.getTop() && that.getBottom() <= this.getBottom())
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	public String toString() {
 		return "[left=" + left + " right=" + right + " top=" + top + " bottom=" + bottom + "]";
+	}
+	
+	public float getLeft() {
+		return left;
+	}
+	
+	public float getRight() {
+		return right;
+	}
+	
+	public float getTop() {
+		return top;
+	}
+	
+	public float getBottom() {
+		return top;
 	}
 }
