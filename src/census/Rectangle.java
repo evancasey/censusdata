@@ -24,17 +24,23 @@ public class Rectangle {
 		//Find the span of the latitudes and longitudes
 	
 		float xLength = data.getMaxLat() - data.getMinLat();
-		float yLength = data.getMinLon() - data.getMinLon();
+		float yLength = data.getMaxLon() - data.getMinLon();
 		
 		//Find latitude and longitude lengths of each rectangle partition
 		float xRecDim = xLength/xBucket;
 		float yRecDim = yLength/yBucket;
 		
 		//Calculate the rectangle coordinates of our CensusGroup
-		float xLoc = (group.getLatitude()/xRecDim) + 1;
-		float yLoc = (group.getLongitude()/yRecDim) + 1;
+		float xLoc = 1;
+		float yLoc = 1;	
+		if (xRecDim > 0) {
+			xLoc = (group.getLatitude()/xRecDim) + 1;
+		}
+		if (yRecDim > 0) {
+			yLoc = (group.getLongitude()/yRecDim) + 1;
+		}
 		
-		System.out.print(xLoc + ", " + xLoc + 1 + ", " + yLoc + ", " + yLoc + 1);
+		System.out.println("[" + xLoc + ", " + xLoc + 1 + ", " + yLoc + ", " + yLoc + 1 + "]");
 		return new Rectangle(xLoc, xLoc + 1, yLoc, yLoc + 1);
 	}
 	

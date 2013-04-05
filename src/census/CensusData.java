@@ -42,33 +42,18 @@ public class CensusData {
 		}
 		CensusGroup g = new CensusGroup(population,latitude,longitude); 
 		data[data_size++] = g;
-		findEdges();
-	}
-	
-	public void findEdges() {
-		//set minLat
-		minLat = data[0].getLatitude();
-		for(int i = 1; i < data_size; i++) {
-
-		}
-		
-		//set minLon
-		minLon = data[0].getLongitude();
-		for(int i = 1; i < data_size; i++) {
-
-		}
-		
-		//set maxLat
-		maxLat = data[0].getLatitude();
-		for(int i = 1; i < data_size; i++) {
-
-		}
-		
-		//set maxLon
-		maxLon = data[0].getLongitude();
-		for(int i = 1; i < data_size; i++) {
-
-		}
+	    if(latitude < minLat) {
+	    	minLat = latitude;
+	    }
+	    if(longitude < minLon) {
+	    	minLon = longitude;
+	    }
+	    if(latitude > maxLat) {
+	    	maxLat = latitude;
+	    }
+	    if(longitude > minLon) {
+	    	maxLon = longitude;
+	    }
 	}
 	
 	//get minLat

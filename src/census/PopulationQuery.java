@@ -93,7 +93,6 @@ public class PopulationQuery {
         Scanner input = new Scanner(System.in);
         String dims = input.nextLine();
         String[] dimsArray = dims.split(" ");
-        System.out.println(dimsArray[0] + dimsArray[3]);
         Rectangle populationIn = new Rectangle(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), 
         										Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3]));
         
