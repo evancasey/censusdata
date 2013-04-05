@@ -20,8 +20,9 @@ public class Rectangle {
 		bottom = b;
 	}
 	
-	public Rectangle makeOneRec (CensusData data, CensusGroup group, int xBucket, int yBucket) {
+	public static Rectangle makeOneRec (CensusData data, CensusGroup group, float xBucket, float yBucket) {
 		//Find the span of the latitudes and longitudes
+	
 		float xLength = data.getMaxLat() - data.getMinLat();
 		float yLength = data.getMinLon() - data.getMinLon();
 		

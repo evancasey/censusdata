@@ -93,9 +93,18 @@ public class PopulationQuery {
         Scanner input = new Scanner(System.in);
         String dims = input.nextLine();
         String[] dimsArray = dims.split(" ");
-      
-        Rectangle populationIn = new Rectangle(Integer.getInteger(dimsArray[0]), Integer.getInteger(dimsArray[1]), 
-        										Integer.getInteger(dimsArray[2]), Integer.getInteger(dimsArray[3]));
+        System.out.println(dimsArray[0] + dimsArray[3]);
+        Rectangle populationIn = new Rectangle(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), 
+        										Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3]));
+        
+        // storing in values before hand to increase prevent multiple lookup
+        int size = thedata.getData_size();
+        CensusGroup[] censusGroups = thedata.getData();
+        
+        for (int i = 0; i < size; i++){
+        	Rectangle currentGroupRect = Rectangle.makeOneRec(thedata, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+        	//populationIn.encompass(currentGroupRect);
+        }
         
         //Create a bunch of rectangles based on max lon and lat and number of buckets
         //How do we associate each census group with a particular rectangle --> no preprocessing?

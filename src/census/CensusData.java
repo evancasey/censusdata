@@ -10,7 +10,15 @@ package census;
 public class CensusData {
 	private static final int INITIAL_SIZE = 100;
 	private CensusGroup[] data;
+
+
 	private int data_size;
+	
+	
+	
+	
+
+
 	private float minLon;
 	private float minLat;
 	private float maxLon;
@@ -81,5 +89,15 @@ public class CensusData {
 	//get minLon
 	public float getMaxLon() {
 		return maxLon;
+	}
+	
+	// get data size
+	public int getData_size() {
+		return data_size;
+	}
+	
+	// get the data array
+	public CensusGroup[] getData() {
+		return data;
 	}
 }
