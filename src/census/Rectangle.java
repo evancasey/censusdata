@@ -20,13 +20,21 @@ public class Rectangle {
 		bottom = b;
 	}
 	
-	public Rectangle makeOneRec (CensusData data, CensusGroup group) {
-		group.getLatitude();
-		group.getLongitude();
+	public Rectangle makeOneRec (CensusData data, CensusGroup group, int xBucket, int yBucket) {
+		//Find the span of the latitudes and longitudes
+		float xLength = data.getMaxLat() - data.getMinLat();
+		float yLength = data.getMinLon() - data.getMinLon();
 		
-		data.getMinLat();;
-		data.getMinLon();
-		return new Rectangle
+		//Find latitude and longitude lengths of each rectangle partition
+		float xRecDim = xLength/xBucket;
+		float yRecDim = yLength/yBucket;
+		
+		//Calculate the rectangle coordinates of our CensusGroup
+		float xLoc = (group.getLatitude()/xRecDim) + 1;
+		float yLoc = (group.getLongitude()/yRecDim) + 1;
+		
+		System.out.print(xLoc + ", " + xLoc + 1 + ", " + yLoc + ", " + yLoc + 1);
+		return new Rectangle(xLoc, xLoc + 1, yLoc, yLoc + 1);
 	}
 	
 	// a functional operation: returns a new Rectangle that is the smallest rectangle
