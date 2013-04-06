@@ -62,7 +62,6 @@ public class PopulationQuery {
         return result;
 	}
 	
-	
 
 	// argument 1: file name for input data: pass this to parse
 	// argument 2: number of x-dimension buckets
@@ -87,37 +86,46 @@ public class PopulationQuery {
         CensusData thedata = parse(args[0]);
         
         // request user input
-        System.out.println("Please enter your box coordinates (separate by spaces):");
+        System.out.println("Please enter your box coordinates (separate by spaces - left right top bottom):");
         
         // stores user input in string box
         Scanner input = new Scanner(System.in);
         String dims = input.nextLine();
         String[] dimsArray = dims.split(" ");
-        Rectangle popRec = new Rectangle(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), 
-        										Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3]));
         
-        // storing in values before hand to increase prevent multiple lookup
-        int size = thedata.getData_size();
-        CensusGroup[] censusGroups = thedata.getData();
-        int sumPop = 0;
-        int sumTotal = 0;
-        int evalTrue = 0;
-        for (int i = 0; i < size; i++){
-        	Rectangle currentGroupRect = Rectangle.makeOneRec(thedata, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
-        	
-        	// adds the population of census group if it is contained in the census rectangle
-        	
-        	if(currentGroupRect.contains(popRec)){
-        		sumPop = sumPop + censusGroups[i].getPopulation();
-        		evalTrue ++;
-        	}
-        	// keeps track of all the people
-        	sumTotal = sumTotal + censusGroups[i].getPopulation();
+        if(Integer.parseInt(dimsArray[0]) >= 1 && Integer.parseInt(dimsArray[1]) <= Integer.parseInt(args[1]) 
+        		&& Integer.parseInt(dimsArray[2]) >= 1 && Integer.parseInt(dimsArray[3]) <= Integer.parseInt(args[2])) {
+
+            Rectangle popRec = new Rectangle(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1])+1, 
+					Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3])+1);
+
+			// storing in values before hand to increase prevent multiple lookup
+			int size = thedata.getData_size();
+			CensusGroup[] censusGroups = thedata.getData();
+			int sumPop = 0;
+			int sumTotal = 0;
+			int evalTrue = 0;
+			
+			for (int i = 0; i < size; i++) {
+				
+				Rectangle currentGroupRect = Rectangle.makeOneRec(thedata, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+			
+				// adds the population of census group if it is contained in the census rectangle
+				if(currentGroupRect.isContained(popRec)){
+					sumPop = sumPop + censusGroups[i].getPopulation();
+					evalTrue++;
+				}
+				
+				// keeps track of all the people
+				sumTotal = sumTotal + censusGroups[i].getPopulation();
+			}
+			
+			System.out.println("Population in census rectangle: " + sumPop);
+			System.out.println("Percentage of total population in rectangle: " + (sumPop/sumTotal)*100 + "%");
+			System.out.println("Number of truths " + evalTrue);
+        } else {
+        	System.out.println("Error: Please reenter a valid set of coordinates");
         }
-        
-        System.out.println("Population in census rectangle: " + sumPop);
-        System.out.println("Percentage of total population in rectangle: " + (sumPop/sumTotal)*100 + "%");
-        System.out.println("Number of truths " + evalTrue);
         
         //Create a bunch of rectangles based on max lon and lat and number of buckets
         //How do we associate each census group with a particular rectangle --> no preprocessing?

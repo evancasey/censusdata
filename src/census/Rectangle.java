@@ -27,26 +27,32 @@ public class Rectangle {
 		float yLength = data.getMaxLon() - data.getMinLon();
 		
 		//Find latitude and longitude lengths of each rectangle partition
-		float xRecDim = xLength/xBucket;
-		float yRecDim = yLength/yBucket;
-		//System.out.println(yRecDim);
+		float xRecDim = (float) ((float) (xLength/xBucket) + .0001);
+		
+		float yRecDim = (float) ((float) (yLength/yBucket) + .0001);
+		
+
 		
 		//Calculate the rectangle coordinates of our CensusGroup
 		int xLoc = 1;
 		int yLoc = 1;	
 		if (xRecDim > 0.0) {
-			xLoc = (int) ((group.getLatitude()-data.getMinLat())/xRecDim) + 1;
+			xLoc = (int) ((group.getLatitude()-data.getMinLat())/xRecDim + 1);
+			
 		}
 		if (yRecDim > 0.0) {
-			yLoc = (int) ((group.getLongitude()-data.getMinLon())/yRecDim) + 1;
+			yLoc = (int) ((group.getLongitude()-data.getMinLon())/yRecDim + 1);
 		}
 		
-		System.out.println("[" + xLoc + ", " + (xLoc + 1) + ", " + yLoc + ", " + (yLoc + 1) + "]");
+		//System.out.println("[" + xLoc + ", " + (xLoc + 1) + ", " + yLoc + ", " + (yLoc + 1) + "]");
+		if (xLoc > 2 || xLoc < 1 || yLoc > 2 || yLoc < 1){
+			System.out.println(" " + xLoc + yLoc);
+		}
 		
 		return new Rectangle(xLoc, xLoc + 1, yLoc, yLoc + 1);
 	}
 	
-	// a functional operation: returns a new Rectangle that is the smallest rectangle
+	// a functional operation: returns a new Rectangle that is the largeest rectangle
 	// containing this and that
 	public Rectangle encompass(Rectangle that) {
 		return new Rectangle(Math.min(this.left,   that.left),
@@ -55,9 +61,14 @@ public class Rectangle {
 				             Math.min(this.bottom, that.bottom));
 	}
 	
-	public Boolean contains(Rectangle that) {
-		if (that.getLeft() >= this.getLeft() && that.getRight() <= this.getRight()
-				&& that.getTop() >= this.getTop() && that.getBottom() <= this.getBottom())
+	public Boolean isContained(Rectangle largeRec) {
+		/*
+		System.out.println(largeRec.getLeft() + "<=" + this.getLeft() + "&&" + largeRec.getRight() + ">=" + this.getRight()
+				+ "&&" +  largeRec.getTop() + "<=" + this.getTop() + "&&" + largeRec.getBottom() + ">=" + this.getBottom());
+	
+		*/
+		if (largeRec.getLeft() <= this.getLeft() && largeRec.getRight() >= this.getRight()
+				&& largeRec.getTop() <= this.getTop() && largeRec.getBottom() >= this.getBottom())
 		{
 			return true;
 		}
@@ -81,6 +92,6 @@ public class Rectangle {
 	}
 	
 	public float getBottom() {
-		return top;
+		return bottom;
 	}
 }
