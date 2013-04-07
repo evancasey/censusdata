@@ -1,4 +1,6 @@
 package census;
+import java.util.Arrays;
+import java.util.concurrent.*;
 /** 
  *  just a resizing array for holding the input
  *  
@@ -7,7 +9,7 @@ package census;
  *  @author: Joe Newbry and Evan Casey
  */
 
-public class CensusData {
+public class CensusData extends RecursiveAction {
 	private static final int INITIAL_SIZE = 100;
 	private CensusGroup[] data;
 	private int data_size;
@@ -15,6 +17,15 @@ public class CensusData {
 	private float minLat;
 	private float maxLon;
 	private float maxLat;
+	// instance variables (lo, high, left data result, right data result, for finding max and min using
+	private int lo;
+	private int hi;
+	CensusGroup[] left;
+	CensusGroup[] right;
+
+	private int cutoffVal = 5;
+	
+	private static final ForkJoinPool fjPool = new ForkJoinPool();
 	
 	public CensusData() {
 		data = new CensusGroup[INITIAL_SIZE];
@@ -23,6 +34,17 @@ public class CensusData {
 		minLon = 100; //maxLon should be above this and negative
 		maxLat = -100; //maxLon should be above this and positive
 		maxLon = -100; //maxLon should be above this and negative
+	}
+	
+	public CensusData(CensusGroup[] group, int l, int h) {
+		data = group;
+		data_size = group.length;
+		minLat = 100; //minLat should be below this and positive
+		minLon = 100; //maxLon should be above this and negative
+		maxLat = -100; //maxLon should be above this and positive
+		maxLon = -100; //maxLon should be above this and negative
+		lo = l;
+		hi = h;
 	}
 	
 	public void add(int population, float latitude, float longitude) {
@@ -34,18 +56,43 @@ public class CensusData {
 		}
 		CensusGroup g = new CensusGroup(population,latitude,longitude); 
 		data[data_size++] = g;
-	    if(g.getLatitude() < minLat) {
-	    	minLat = g.getLatitude();
+	}
+	
+	public void findEdgesSeq() {
+		for(int i=0; i < data_size; ++i) {
+			System.out.println(i);
+		    if(data[i].getLatitude() < minLat) {
+		    	minLat = data[i].getLatitude();
+		    }
+		    if(data[i].getLongitude() < minLon) {
+		    	minLon = data[i].getLongitude();
+		    }
+		    if(data[i].getLatitude() > maxLat) {
+		    	maxLat = data[i].getLatitude();
+		    }
+		    if(data[i].getLongitude() > maxLon) {
+		    	maxLon = data[i].getLongitude();
+		    }
 	    }
-	    if(g.getLongitude() < minLon) {
-	    	minLon = g.getLongitude();
-	    }
-	    if(g.getLatitude() > maxLat) {
-	    	maxLat = g.getLatitude();
-	    }
-	    if(g.getLongitude() > maxLon) {
-	    	maxLon = g.getLongitude();
-	    }
+	}
+	
+	public void findEdgesPar() {
+		fjPool.invoke(new CensusData(data, 0, data_size));
+	}
+	
+	@Override
+	protected void compute() {
+		if ((hi - lo) < cutoffVal) {
+			this.findEdgesSeq();
+		} else {
+			int mid = data_size/2;
+			CensusData left = new CensusData(Arrays.copyOfRange(data, lo, mid), lo, mid);
+			CensusData right = new CensusData(Arrays.copyOfRange(data, mid, hi), mid, hi);
+			left.fork();
+			right.compute();
+			left.join();
+		}
+		
 	}
 	
 	//get minLat

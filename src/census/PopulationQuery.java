@@ -46,9 +46,6 @@ public class PopulationQuery {
                 			   Float.parseFloat(tokens[LATITUDE_INDEX]),
                 		       Float.parseFloat(tokens[LONGITUDE_INDEX]));
             }
-            
-            // call findEdges to set minLat, minLon, maxLat, maxLon
-           // result.findEdges();
 
             fileIn.close();
         } catch(IOException ioe) {
@@ -68,65 +65,102 @@ public class PopulationQuery {
 	// argument 3: number of y-dimension buckets
     // argument 4: -v1, -v2, -v3, -v4, or -v5
 	public static void main(String[] args) {
-		// FOR YOU
+		//Print out our run configurations
 	    System.out.println("File: " + args[0]);
         System.out.println("arg1: " + args[1]);
         System.out.println("arg2: " + args[2]);
         System.out.println("arg3: " + args[3]);
 
+        //Initialize a new CensusData and call parse to read in the data
         CensusData data = new CensusData();
-        data = parse(args[0]);
+        data = parse(args[0]); 
         
+        //Store our grid dimensions as ints
         int xBuckets = Integer.parseInt(args[1]);
-        int yBuckets = Integer.parseInt(args[2]);
-        
-        System.out.println(data.getMinLat() + ", " + data.getMinLon() + ", " + data.getMaxLat() + ", " + data.getMaxLon());
-        
-        // parses the input txt file and calculates the min and max longitudes
-        CensusData thedata = parse(args[0]);
-        
-        // request user input
-        System.out.println("Please enter your box coordinates (separate by spaces - left right top bottom):");
-        
-        // stores user input in string box
-        Scanner input = new Scanner(System.in);
-        String dims = input.nextLine();
-        String[] dimsArray = dims.split(" ");
-        
-        if(Integer.parseInt(dimsArray[0]) >= 1 && Integer.parseInt(dimsArray[1]) <= Integer.parseInt(args[1]) 
-        		&& Integer.parseInt(dimsArray[2]) >= 1 && Integer.parseInt(dimsArray[3]) <= Integer.parseInt(args[2])) {
-
-            Rectangle popRec = new Rectangle(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1])+1, 
+	    int yBuckets = Integer.parseInt(args[2]);
+	    
+	    //Request user input
+	    System.out.println("Please enter your box coordinates (separate by spaces - left right top bottom):");
+	    
+	    //Stores user input in dimsArray
+	    Scanner input = new Scanner(System.in);
+	    String dims = input.nextLine();
+	    String[] dimsArray = dims.split(" ");
+	    
+		//Initializing values - used in all versions
+		int size = data.getData_size(); //number of data entries
+		CensusGroup[] censusGroups = data.getData(); //array of censusGroups
+		int sumPop = 0; //total population within the queryRec
+		int sumTotal = 0; //total population of all the data
+		int evalTrue = 0; //test variable
+	    
+	    //Check to make sure input query is valid
+	    if(Integer.parseInt(dimsArray[0]) >= 1 && Integer.parseInt(dimsArray[1]) <= Integer.parseInt(args[1]) 
+	    		&& Integer.parseInt(dimsArray[2]) >= 1 && Integer.parseInt(dimsArray[3]) <= Integer.parseInt(args[2])) {
+	    	
+	    	//Create a rectangle to represent the query rectangle
+	        Rectangle queryRec = new Rectangle(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1])+1, 
 					Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3])+1);
-
-			// storing in values before hand to increase prevent multiple lookup
-			int size = thedata.getData_size();
-			CensusGroup[] censusGroups = thedata.getData();
-			int sumPop = 0;
-			int sumTotal = 0;
-			int evalTrue = 0;
-			
-			for (int i = 0; i < size; i++) {
-				
-				Rectangle currentGroupRect = Rectangle.makeOneRec(thedata, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
-			
-				// adds the population of census group if it is contained in the census rectangle
-				if(currentGroupRect.isContained(popRec)){
-					sumPop = sumPop + censusGroups[i].getPopulation();
-					evalTrue++;
-				}
-				
-				// keeps track of all the people
-				sumTotal = sumTotal + censusGroups[i].getPopulation();
-			}
-			
-			System.out.println("Population in census rectangle: " + sumPop);
-			System.out.println("Percentage of total population in rectangle: " + (sumPop/sumTotal)*100 + "%");
-			System.out.println("Number of truths " + evalTrue);
-        } else {
-        	System.out.println("Error: Please reenter a valid set of coordinates");
-        }
-        
+	
+	        //If v1, we execute our program sequentially - least efficient
+	        if(args[3].equals("-v1")) {
+			    
+			    //Call findEdgesSeq to set minLat, minLon, maxLat, maxLon sequentially
+			    data.findEdgesSeq();
+			    
+			    //Print out the minLat, minLon, maxLat, maxLon
+			    System.out.println(data.getMinLat() + ", " + data.getMinLon() + ", " + data.getMaxLat() + ", " + data.getMaxLon());
+			    
+			    	//We make a new rectangle for each censusGroup and check to see if it is contained by queryRec
+					for (int i = 0; i < size; i++) {
+						
+						Rectangle currentGroupRect = Rectangle.makeOneRec(data, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+					
+						//Adds the population of census group if it is contained in the census rectangle
+						if(currentGroupRect.isContained(queryRec)){
+							sumPop = sumPop + censusGroups[i].getPopulation();
+							evalTrue++; //update our test variable
+						}
+						
+						//Keeps track of all the people
+						sumTotal = sumTotal + censusGroups[i].getPopulation();
+					}
+	        }
+	        
+	        if(args[3].equals("-v2")) {
+	        	
+	        	//Call findEdgesSeq to set minLat, minLon, maxLat, maxLon sequentially
+			    data.findEdgesPar();
+			    
+			  //Print out the minLat, minLon, maxLat, maxLon
+			    System.out.println(data.getMinLat() + ", " + data.getMinLon() + ", " + data.getMaxLat() + ", " + data.getMaxLon());
+			    
+			    	//We make a new rectangle for each censusGroup and check to see if it is contained by queryRec
+					for (int i = 0; i < size; i++) {
+						
+						Rectangle currentGroupRect = Rectangle.makeOneRec(data, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+					
+						//Adds the population of census group if it is contained in the census rectangle
+						if(currentGroupRect.isContained(queryRec)){
+							sumPop = sumPop + censusGroups[i].getPopulation();
+							evalTrue++; //update our test variable
+						}
+						
+						//Keeps track of all the people
+						sumTotal = sumTotal + censusGroups[i].getPopulation();
+					}
+	        }
+					
+	    } else {
+			    	
+	    	System.out.println("Error: Please reenter a valid set of coordinates");
+			    	
+	    }
+	    
+		System.out.println("Population in census rectangle: " + sumPop);
+		System.out.println("Percentage of total population in rectangle: " + (sumPop/sumTotal)*100 + "%");
+		System.out.println("Number of truths " + evalTrue);
+	        
         //Create a bunch of rectangles based on max lon and lat and number of buckets
         //How do we associate each census group with a particular rectangle --> no preprocessing?
         
