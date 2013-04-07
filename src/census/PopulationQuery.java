@@ -2,7 +2,7 @@ package census;
 /**
  * Main class that handles population Queries
  * 
- * @author Evan Casey
+ * @author Evan Casey and Joe Newbry
  */
 
 import java.io.BufferedReader;
@@ -106,11 +106,12 @@ public class PopulationQuery {
 	        if(args[3].equals("-v1")) {
 			    
 			    //Call findEdgesSeq to set minLat, minLon, maxLat, maxLon sequentially
-			    data.findEdgesSeq();
+			    data.findEdgesSeq(0, size);
 			    
 			    //Print out the minLat, minLon, maxLat, maxLon
 			    System.out.println(data.getMinLat() + ", " + data.getMinLon() + ", " + data.getMaxLat() + ", " + data.getMaxLon());
 			    
+			    	//Sequential query processing
 			    	//We make a new rectangle for each censusGroup and check to see if it is contained by queryRec
 					for (int i = 0; i < size; i++) {
 						
@@ -132,23 +133,22 @@ public class PopulationQuery {
 	        	//Call findEdgesSeq to set minLat, minLon, maxLat, maxLon sequentially
 			    data.findEdgesPar();
 			    
-			  //Print out the minLat, minLon, maxLat, maxLon
+			    //Print out the minLat, minLon, maxLat, maxLon
 			    System.out.println(data.getMinLat() + ", " + data.getMinLon() + ", " + data.getMaxLat() + ", " + data.getMaxLon());
 			    
-			    	//We make a new rectangle for each censusGroup and check to see if it is contained by queryRec
-					for (int i = 0; i < size; i++) {
-						
-						Rectangle currentGroupRect = Rectangle.makeOneRec(data, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
-					
-						//Adds the population of census group if it is contained in the census rectangle
-						if(currentGroupRect.isContained(queryRec)){
-							sumPop = sumPop + censusGroups[i].getPopulation();
-							evalTrue++; //update our test variable
-						}
-						
-						//Keeps track of all the people
-						sumTotal = sumTotal + censusGroups[i].getPopulation();
-					}
+			    data.processQuery(Float.parseFloat(args[1]), Float.parseFloat(args[1]), queryRec);
+			    sumPop = data.getQueryPop();
+			    sumTotal = data.getTotalPop();
+	        }
+	        
+	        if(args[3].equals("-v3")) {
+	        	
+	        	//Call findEdgesSeq to set minLat, minLon, maxLat, maxLon sequentially
+			    data.findEdgesSeq(0, size);
+			    
+			    data.preProcess(Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+	        	sumPop = data.queryProcess(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3]));
+	        	sumTotal = data.queryProcess(1, Integer.parseInt(args[1]), 1, Integer.parseInt(args[2]));
 	        }
 					
 	    } else {
@@ -158,8 +158,9 @@ public class PopulationQuery {
 	    }
 	    
 		System.out.println("Population in census rectangle: " + sumPop);
-		System.out.println("Percentage of total population in rectangle: " + (sumPop/sumTotal)*100 + "%");
-		System.out.println("Number of truths " + evalTrue);
+		System.out.println("Total Population: " + sumTotal);
+		System.out.println("Percentage of total population in rectangle: " + ((float)sumPop/(float)sumTotal)*100 + "%");
+		System.out.println("Number of data points " + evalTrue);
 	        
         //Create a bunch of rectangles based on max lon and lat and number of buckets
         //How do we associate each census group with a particular rectangle --> no preprocessing?

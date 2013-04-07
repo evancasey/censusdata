@@ -44,11 +44,6 @@ public class Rectangle {
 			yLoc = (int) ((group.getLongitude()-data.getMinLon())/yRecDim + 1);
 		}
 		
-		//System.out.println("[" + xLoc + ", " + (xLoc + 1) + ", " + yLoc + ", " + (yLoc + 1) + "]");
-		if (xLoc > 2 || xLoc < 1 || yLoc > 2 || yLoc < 1){
-			System.out.println(" " + xLoc + yLoc);
-		}
-		
 		return new Rectangle(xLoc, xLoc + 1, yLoc, yLoc + 1);
 	}
 	

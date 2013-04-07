@@ -1,6 +1,7 @@
 package census;
-import java.util.Arrays;
+import structure5.*;
 import java.util.concurrent.*;
+import java.util.*;
 /** 
  *  just a resizing array for holding the input
  *  
@@ -9,23 +10,33 @@ import java.util.concurrent.*;
  *  @author: Joe Newbry and Evan Casey
  */
 
-public class CensusData extends RecursiveAction {
+public class CensusData{
 	private static final int INITIAL_SIZE = 100;
 	private CensusGroup[] data;
 	private int data_size;
+	
+	// fields to store 
 	private float minLon;
 	private float minLat;
 	private float maxLon;
 	private float maxLat;
+	
 	// instance variables (lo, high, left data result, right data result, for finding max and min using
 	private int lo;
 	private int hi;
-	CensusGroup[] left;
-	CensusGroup[] right;
+	
+	// fields to store population values when processing a query
+	private int queryPop;
 
-	private int cutoffVal = 5;
+	private int totalPop;
+
+	private static int SEQUENTIAL_CUTOFF = 100;
 	
 	private static final ForkJoinPool fjPool = new ForkJoinPool();
+	
+	// processed matrix
+	private int[][] beforeProcess;
+	private int[][] afterProcess;
 	
 	public CensusData() {
 		data = new CensusGroup[INITIAL_SIZE];
@@ -36,15 +47,15 @@ public class CensusData extends RecursiveAction {
 		maxLon = -100; //maxLon should be above this and negative
 	}
 	
-	public CensusData(CensusGroup[] group, int l, int h) {
-		data = group;
-		data_size = group.length;
-		minLat = 100; //minLat should be below this and positive
-		minLon = 100; //maxLon should be above this and negative
-		maxLat = -100; //maxLon should be above this and positive
-		maxLon = -100; //maxLon should be above this and negative
-		lo = l;
-		hi = h;
+	
+	// find edges by invoking fjpool on V2Corners
+	public void findEdgesPar() {
+		V2Corners corners = new V2Corners(0, data_size, data);
+		fjPool.invoke(corners);
+		minLat = corners.minLat;
+		minLon = corners.minLon;
+		maxLon = corners.maxLon;
+		maxLat = corners.maxLat;
 	}
 	
 	public void add(int population, float latitude, float longitude) {
@@ -58,9 +69,8 @@ public class CensusData extends RecursiveAction {
 		data[data_size++] = g;
 	}
 	
-	public void findEdgesSeq() {
-		for(int i=0; i < data_size; ++i) {
-			System.out.println(i);
+	public void findEdgesSeq(int lo, int hi) {
+		for(int i=lo; i < hi; ++i) {
 		    if(data[i].getLatitude() < minLat) {
 		    	minLat = data[i].getLatitude();
 		    }
@@ -76,23 +86,57 @@ public class CensusData extends RecursiveAction {
 	    }
 	}
 	
-	public void findEdgesPar() {
-		fjPool.invoke(new CensusData(data, 0, data_size));
+	public void processQuery(float xDim, float yDim, Rectangle queryRec) {
+		V2Query query = new V2Query(0, data_size, data, xDim, yDim, queryRec, this);
+		fjPool.invoke(query);
+		totalPop = query.totalPop;
+		queryPop = query.queryPop;
 	}
 	
-	@Override
-	protected void compute() {
-		if ((hi - lo) < cutoffVal) {
-			this.findEdgesSeq();
-		} else {
-			int mid = data_size/2;
-			CensusData left = new CensusData(Arrays.copyOfRange(data, lo, mid), lo, mid);
-			CensusData right = new CensusData(Arrays.copyOfRange(data, mid, hi), mid, hi);
-			left.fork();
-			right.compute();
-			left.join();
+	public void preProcess(float xDim, float yDim) {
+		System.out.println((int)xDim + (int)yDim);
+		beforeProcess = new int[(int) (xDim+1)][(int) (yDim+1)];
+		afterProcess = new int[(int) (xDim+1)][(int) (yDim+1)];
+		// putting in zero values for all of these (0 value excluded because it won't be used
+		// decided to leave 0 values empty rather than subtracting 1 from each query value
+		for (int i = 1; i <= xDim; i++) {
+			for (int j = 1; j <= yDim; j++) {
+				System.out.println("x,y " + i + " " + j);
+				beforeProcess[i][j] = 0;
+				afterProcess[i][j] = 0;
+			}
 		}
 		
+		// update beforeProcess with the actual populations
+		for (int i = 0; i < data_size; i++) {
+			Rectangle currentGroupRect = Rectangle.makeOneRec(this, data[i], xDim, yDim);
+			beforeProcess[(int)currentGroupRect.getLeft()][(int)currentGroupRect.getTop()] = beforeProcess[(int)currentGroupRect.getLeft()][(int)currentGroupRect.getTop()] 
+																								+ data[i].getPopulation();
+		}
+		
+		for (int i = 1; i<= xDim; i++){
+			for (int j = 1; j<=yDim; j ++){
+				int sumOfPop = 0;
+				// subtract double counted square
+				if (j-1 > 0 && i-1> 0){
+					sumOfPop = sumOfPop - afterProcess[i-1][j-1];
+				}
+				
+				// add squares to the left and above (y-1)
+				if (i -1 > 0){
+					sumOfPop = sumOfPop + afterProcess[i-1][j];
+				}
+				if  (j -1 > 0){
+					sumOfPop = sumOfPop + afterProcess[i][j-1];
+				}
+				sumOfPop = sumOfPop + beforeProcess[i][j];
+				afterProcess[i][j] = sumOfPop;
+			}
+		}
+	}
+	
+	public int queryProcess(int left, int right, int top, int bottom){
+		return afterProcess[right][bottom] - afterProcess[left-1][bottom] - afterProcess[right][top-1] + afterProcess[left-1][top-1];
 	}
 	
 	//get minLat
@@ -123,5 +167,24 @@ public class CensusData extends RecursiveAction {
 	// get the data array
 	public CensusGroup[] getData() {
 		return data;
+	}
+	
+	public int getQueryPop() {
+		return queryPop;
+	}
+
+
+	public void setQueryPop(int queryPop) {
+		this.queryPop = queryPop;
+	}
+
+
+	public int getTotalPop() {
+		return totalPop;
+	}
+
+
+	public void setTotalPop(int totalPop) {
+		this.totalPop = totalPop;
 	}
 }
