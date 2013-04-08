@@ -1,13 +1,16 @@
 package census;
+
 /** A class to represent a Rectangle
  *  You do not have to use this, but it's quite convenient
  *  
+ *  
  *  @author Joe Newbry and Evan Casey
+ *  @version 4/7/2013
  */
  
 public class Rectangle {
-        // invariant: right >= left and top >= bottom (i.e., numbers get bigger as you move up/right)
-        // note in our census data longitude "West" is a negative number which nicely matches bigger-to-the-right
+    // invariant: right >= left and top >= bottom (i.e., numbers get bigger as you move up/right)
+    // note in our census data longitude "West" is a negative number which nicely matches bigger-to-the-right
 	private float left;
 	private float right;
 	private float top;
@@ -20,9 +23,8 @@ public class Rectangle {
 		bottom = b;
 	}
 	
+	//Find the span of the latitudes and longitudes
 	public static Rectangle makeOneRec (CensusData data, CensusGroup group, float xBucket, float yBucket) {
-		//Find the span of the latitudes and longitudes
-	
 		float xLength = data.getMaxLat() - data.getMinLat();
 		float yLength = data.getMaxLon() - data.getMinLon();
 		
@@ -30,8 +32,6 @@ public class Rectangle {
 		float xRecDim = (float) ((float) (xLength/xBucket) + .0001);
 		
 		float yRecDim = (float) ((float) (yLength/yBucket) + .0001);
-		
-
 		
 		//Calculate the rectangle coordinates of our CensusGroup
 		int xLoc = 1;
@@ -56,12 +56,9 @@ public class Rectangle {
 				             Math.min(this.bottom, that.bottom));
 	}
 	
-	public Boolean isContained(Rectangle largeRec) {
-		/*
-		System.out.println(largeRec.getLeft() + "<=" + this.getLeft() + "&&" + largeRec.getRight() + ">=" + this.getRight()
-				+ "&&" +  largeRec.getTop() + "<=" + this.getTop() + "&&" + largeRec.getBottom() + ">=" + this.getBottom());
 	
-		*/
+	// returns whether or not a rectangle is contained in anthor rectangle (largeRec)
+	public Boolean isContained(Rectangle largeRec) {
 		if (largeRec.getLeft() <= this.getLeft() && largeRec.getRight() >= this.getRight()
 				&& largeRec.getTop() <= this.getTop() && largeRec.getBottom() >= this.getBottom())
 		{

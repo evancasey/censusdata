@@ -1,9 +1,11 @@
 package census;
+
 /**
  * class that uses Mercator project to convert coordinates
  * on a sphere into coordinates onto a flat plane
  * 
  * @author Joe Newbry and Evan Casey
+ * @version 4/7/2013
  */
 
 public class CensusGroup {
@@ -22,7 +24,6 @@ public class CensusGroup {
 	private float mercatorConversion(float lat){
 		float latpi = (float)(lat * Math.PI / 180);
 		float x = (float)Math.log(Math.tan(latpi) + 1 / Math.cos(latpi));
-		//System.out.println(lat + " -> " + x);
 		return x;
 	}
 	

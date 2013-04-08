@@ -1,6 +1,16 @@
 package census;
 import java.util.concurrent.*;
 
+/**
+ * Class uses parallelism to compute the total population within a give query.
+ * Number of threads created depends on the sequential cutoff
+ *
+ * 
+ * @author Joe Newbry and Evan Casey
+ * @version 4/7/2013
+ *
+ */
+
 public class V2Query extends RecursiveAction {
 	
 	private static final int SEQUENTIAL_CUTOFF = 50;
@@ -17,13 +27,13 @@ public class V2Query extends RecursiveAction {
 	Rectangle queryRec;
 	CensusData censusData;
 	
+	//Constructor for v2Query class
 	public V2Query(int l, int h, CensusGroup[] data, float xDim, float yDim, Rectangle queryRec, CensusData censusData){
 		lo = l;
 		hi = h;
 		totalPop = 0;
 		queryPop = 0;
 		this.data = data;
-		
 		this.xDim = xDim;
 		this.yDim = yDim;
 		this.queryRec = queryRec;
@@ -46,6 +56,7 @@ public class V2Query extends RecursiveAction {
 		}
 	}
 	
+	//used to find the population of the smaller list of censusGroups sequentially
 	protected void findPopSeq(int lo, int hi) {
 		
 		for (int i = lo; i < hi; i++) {

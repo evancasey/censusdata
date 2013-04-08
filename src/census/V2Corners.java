@@ -5,11 +5,9 @@ import java.util.concurrent.*;
  * Class uses parallelism to compute the min and max of latitude and longitudes for an
  * array with each object in the array containing a CensusGroup which has a lat and long.
  *
- * In addition the population contained in each CensusGroup point in the array 
- * contained in the search querry can be found using efficient threading.
  * 
- * @author Joe Newbry and Evan Cases
- * @version 4/7/2012
+ * @author Joe Newbry and Evan Casey
+ * @version 4/7/2013
  *
  */
 public class V2Corners extends RecursiveAction {
@@ -68,7 +66,6 @@ public class V2Corners extends RecursiveAction {
 		    	maxLon = data[i].getLongitude();
 		    }
 	    }
-		System.out.println("changing values" + minLat + minLon);
 	}
 	
 	public float getMinLat() {

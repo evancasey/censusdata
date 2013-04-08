@@ -1,13 +1,14 @@
 package census;
-import structure5.*;
 import java.util.concurrent.*;
 import java.util.*;
+
 /** 
- *  just a resizing array for holding the input
+ *  Just a resizing array for holding the input
  *  
  *  note: array may not be full; see data_size field
  *  
  *  @author: Joe Newbry and Evan Casey
+ *  @version 4/7/2013
  */
 
 public class CensusData{
@@ -15,7 +16,7 @@ public class CensusData{
 	private CensusGroup[] data;
 	private int data_size;
 	
-	// fields to store 
+	// fields to store the max and min latitudes and longitudes
 	private float minLon;
 	private float minLat;
 	private float maxLon;
@@ -27,11 +28,9 @@ public class CensusData{
 	
 	// fields to store population values when processing a query
 	private int queryPop;
-
 	private int totalPop;
-
-	private static int SEQUENTIAL_CUTOFF = 100;
 	
+	// initializing a new fork join pool to set up multithreading
 	private static final ForkJoinPool fjPool = new ForkJoinPool();
 	
 	// processed matrix
@@ -47,17 +46,7 @@ public class CensusData{
 		maxLon = -100; //maxLon should be above this and negative
 	}
 	
-	
-	// find edges by invoking fjpool on V2Corners
-	public void findEdgesPar() {
-		V2Corners corners = new V2Corners(0, data_size, data);
-		fjPool.invoke(corners);
-		minLat = corners.minLat;
-		minLon = corners.minLon;
-		maxLon = corners.maxLon;
-		maxLat = corners.maxLat;
-	}
-	
+	// stores each data point as a censusGroup object and adds it to censusData
 	public void add(int population, float latitude, float longitude) {
 		if(data_size == data.length) { // resize
 			CensusGroup[] new_data = new CensusGroup[data.length*2];
@@ -69,6 +58,7 @@ public class CensusData{
 		data[data_size++] = g;
 	}
 	
+	// sequential version for finding min and max latitudes and longitudes
 	public void findEdgesSeq(int lo, int hi) {
 		for(int i=lo; i < hi; ++i) {
 		    if(data[i].getLatitude() < minLat) {
@@ -85,7 +75,19 @@ public class CensusData{
 		    }
 	    }
 	}
+
+	// find edges by invoking fjpool on V2Corners
+	public void findEdgesPar() {
+		V2Corners corners = new V2Corners(0, data_size, data);
+		fjPool.invoke(corners);
+		minLat = corners.minLat;
+		minLon = corners.minLon;
+		maxLon = corners.maxLon;
+		maxLat = corners.maxLat;
+	}
 	
+	// version that uses parallelism to return the population contained within the query rectangle
+	// sequential version is in main
 	public void processQuery(float xDim, float yDim, Rectangle queryRec) {
 		V2Query query = new V2Query(0, data_size, data, xDim, yDim, queryRec, this);
 		fjPool.invoke(query);
@@ -93,15 +95,16 @@ public class CensusData{
 		queryPop = query.queryPop;
 	}
 	
+	// creates one array to hold the population for each rectangle coordinate, then creates
+	// another array to hold the preprocessed population values
 	public void preProcess(float xDim, float yDim) {
-		System.out.println((int)xDim + (int)yDim);
 		beforeProcess = new int[(int) (xDim+1)][(int) (yDim+1)];
 		afterProcess = new int[(int) (xDim+1)][(int) (yDim+1)];
+		
 		// putting in zero values for all of these (0 value excluded because it won't be used
 		// decided to leave 0 values empty rather than subtracting 1 from each query value
 		for (int i = 1; i <= xDim; i++) {
 			for (int j = 1; j <= yDim; j++) {
-				System.out.println("x,y " + i + " " + j);
 				beforeProcess[i][j] = 0;
 				afterProcess[i][j] = 0;
 			}
@@ -135,6 +138,7 @@ public class CensusData{
 		}
 	}
 	
+	//return the population values in the query rectangle using the preprocessed grid
 	public int queryProcess(int left, int right, int top, int bottom){
 		return afterProcess[right][bottom] - afterProcess[left-1][bottom] - afterProcess[right][top-1] + afterProcess[left-1][top-1];
 	}
