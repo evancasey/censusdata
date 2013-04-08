@@ -158,13 +158,14 @@ public class PopulationQuery {
 	        
 			// uncomment following lines if you want to get testing results
 	    	
-			long v1FindEdge = 1000000;
-			long v2FindEdge = 1000000;
-			long v3PreProcess = 1000000;
+	        /*
+			long v1FindEdge = 100000000;
+			long v2FindEdge = 100000000;
+			long v3PreProcess = 100000000;
 			
-			long v1Query = 1000000;
-			long v2Query = 1000000;
-			long v3Query = 1000000;
+			long v1Query = 100000000;
+			long v2Query = 100000000;
+			long v3Query = 100000000;
 			
 			// ******* Testing V1 Finding Edges ***********
 			//warm up
@@ -317,6 +318,17 @@ public class PopulationQuery {
 					v3Query = sw.getTime();
 				}
 			}
+			
+			System.out.println();
+			System.out.println("v1FindEdge: " + v1FindEdge);
+			System.out.println("v2FindEdge: " + v2FindEdge); //should be smaller than first one
+			System.out.println("v3PreProcess: " + v3PreProcess);
+			System.out.println("v1Query: " + v1Query);
+			System.out.println("v2Query: " + v2Query); //should be smaller than first one
+			System.out.println("v3Query: " + v3Query); //should be smaller than first two
+			System.out.println();
+			
+			*/
 					
 	    } else {
 	    	System.out.println("Error: Please reenter a valid set of coordinates");
