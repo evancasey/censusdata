@@ -20,6 +20,8 @@ public class PopulationQuery {
 	private static final int LATITUDE_INDEX   = 5;
 	private static final int LONGITUDE_INDEX  = 6;
 	
+	private static StopWatch sw = new StopWatch();
+	
 	// parse the input file into a large array held in a CensusData object
 	public static CensusData parse(String filename) {
 		CensusData result = new CensusData();
@@ -137,7 +139,7 @@ public class PopulationQuery {
 			    System.out.println(data.getMinLat() + ", " + data.getMinLon() + ", " + data.getMaxLat() + ", " + data.getMaxLon());
 			    
 			    //Process the query and return the population in the query rectangle
-			    data.processQuery(Float.parseFloat(args[1]), Float.parseFloat(args[1]), queryRec);
+			    data.processQuery(Float.parseFloat(args[1]), Float.parseFloat(args[2]), queryRec);
 			    sumPop = data.getQueryPop();
 			    sumTotal = data.getTotalPop();
 	        }
@@ -153,6 +155,109 @@ public class PopulationQuery {
 	        	sumPop = data.queryProcess(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3]));
 	        	sumTotal = data.queryProcess(1, Integer.parseInt(args[1]), 1, Integer.parseInt(args[2]));
 	        }
+	        
+			// uncomment following lines if you want to get testing results
+	    	
+			long v1FindEdge = 1000000;
+			long v2FindEdge = 1000000;
+			long v3FindEdge = 1000000;
+			
+			long v1Query = 1000000;
+			long v2Query = 1000000;
+			long v3Query = 1000000;
+			
+			// ******* Testing V1 Finding Edges ***********
+			//warm up
+			for(int i = 0; i < 20; i++){
+				data.findEdgesSeq(0, size);
+			}
+			
+			// actual testing
+			for(int i = 0; i < 10; i++){
+				sw.reset();
+				System.gc();
+				sw.start();
+				data.findEdgesSeq(0, size);
+				sw.stop();
+				
+				// store result if it's smaller previous fastest time
+				if(v1FindEdge > sw.getTime()){
+					v1FindEdge = sw.getTime();
+				}
+			}
+			
+			// ******* Testing V1 Query ***********
+			// warm up
+			for(int j = 0; j < 20; j++){
+				for (int i = 0; i < size; i++) {
+					Rectangle currentGroupRect = Rectangle.makeOneRec(data, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+				
+					//Adds the population of census group if it is contained in the census rectangle
+					if(currentGroupRect.isContained(queryRec)){
+						sumPop = sumPop + censusGroups[i].getPopulation();
+					}
+					
+					//Keeps track of all the people
+					sumTotal = sumTotal + censusGroups[i].getPopulation();
+				}
+			}
+			
+			// actual testing
+			for(int j = 0; j < 10; j++){
+				sw.reset();
+				System.gc();
+				sw.start();
+				for (int i = 0; i < size; i++) {
+					Rectangle currentGroupRect = Rectangle.makeOneRec(data, censusGroups[i], Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+				
+					//Adds the population of census group if it is contained in the census rectangle
+					if(currentGroupRect.isContained(queryRec)){
+						sumPop = sumPop + censusGroups[i].getPopulation();
+					}
+					
+					//Keeps track of all the people
+					sumTotal = sumTotal + censusGroups[i].getPopulation();
+				}
+				sw.stop();
+				
+				if(sw.getTime() < v1Query){
+					v1Query = sw.getTime();
+				}	
+			}
+			
+			// ********** Testing V2 Finding Edges ***********
+			
+			// warm up
+			for(int i = 0; i < 20; i++){
+				data.findEdgesPar();
+			}
+			
+			// actual test
+			for (int i = 0; i < 10; i++){
+				sw.reset();
+				System.gc();
+				sw.start();
+				data.findEdgesPar();
+				sw.stop();
+				
+				// store result if it's smaller previous fastest time
+				if(v2FindEdge > sw.getTime()){
+					v2FindEdge = sw.getTime();
+				}
+			}
+			
+			// ****** Testing V2 Query *********
+			
+			// warm up
+			for(int i = 0; i < 20; i++ ){
+			    data.processQuery(Float.parseFloat(args[1]), Float.parseFloat(args[2]), queryRec);
+			    sumPop = data.getQueryPop();
+			    sumTotal = data.getTotalPop();
+			}
+			
+			// actual test
+			
+			
 					
 	    } else {
 	    	System.out.println("Error: Please reenter a valid set of coordinates");
@@ -160,6 +265,7 @@ public class PopulationQuery {
 	    
 		System.out.println("Population in census rectangle: " + sumPop);
 		System.out.println("Total Population: " + sumTotal);
-		System.out.println("Percentage of total population in rectangle: " + ((float)sumPop/(float)sumTotal)*100 + "%");
+		System.out.println("Percentage of total population in rectangle: " + ((float)sumPop/(float)sumTotal)*100 + "%");		
 	}
+
 }
