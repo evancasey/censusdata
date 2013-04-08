@@ -160,7 +160,7 @@ public class PopulationQuery {
 	    	
 			long v1FindEdge = 1000000;
 			long v2FindEdge = 1000000;
-			long v3FindEdge = 1000000;
+			long v3PreProcess = 1000000;
 			
 			long v1Query = 1000000;
 			long v2Query = 1000000;
@@ -246,7 +246,7 @@ public class PopulationQuery {
 				}
 			}
 			
-			// ****** Testing V2 Query *********
+			// ******** Testing V2 Query *********
 			
 			// warm up
 			for(int i = 0; i < 20; i++ ){
@@ -256,8 +256,67 @@ public class PopulationQuery {
 			}
 			
 			// actual test
+			for (int i = 0; i < 10; i++){
+				sw.reset();
+				System.gc();
+				sw.start();
+				data.processQuery(Float.parseFloat(args[1]), Float.parseFloat(args[2]), queryRec);
+			    sumPop = data.getQueryPop();
+			    sumTotal = data.getTotalPop();
+				sw.stop();
+				
+				// store result if it's smaller previous fastest time
+				if(v2Query > sw.getTime()){
+					v2Query = sw.getTime();
+				}
+			}
 			
+			// ******** Testing V3 Preprocess ********
 			
+			// find edges first
+		    data.findEdgesSeq(0, size);
+		    
+		    // warm up
+ 			for(int i = 0; i < 20; i++ ){
+ 			    data.preProcess(Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+ 			}
+ 			
+ 			// actual test
+ 			for (int i = 0; i < 10; i++){
+				sw.reset();
+				System.gc();
+				sw.start();
+				data.preProcess(Float.parseFloat(args[1]), Float.parseFloat(args[2]));
+				sw.stop();
+				
+				// store result if it's smaller previous fastest time
+				if(v3PreProcess > sw.getTime()){
+					v3PreProcess = sw.getTime();
+				}
+			}
+ 			
+			// ******** Testing V3 Query *********
+			
+		    // warm up
+			for(int i = 0; i < 20; i++ ){
+				sumPop = data.queryProcess(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3]));
+	        	sumTotal = data.queryProcess(1, Integer.parseInt(args[1]), 1, Integer.parseInt(args[2]));
+			}
+			
+			// actual test
+			for (int i = 0; i < 10; i++){
+				sw.reset();
+				System.gc();
+				sw.start();
+				sumPop = data.queryProcess(Integer.parseInt(dimsArray[0]), Integer.parseInt(dimsArray[1]), Integer.parseInt(dimsArray[2]), Integer.parseInt(dimsArray[3]));
+	        	sumTotal = data.queryProcess(1, Integer.parseInt(args[1]), 1, Integer.parseInt(args[2]));
+				sw.stop();
+				
+				// store result if it's smaller previous fastest time
+				if(v3Query > sw.getTime()){
+					v3Query = sw.getTime();
+				}
+			}
 					
 	    } else {
 	    	System.out.println("Error: Please reenter a valid set of coordinates");
